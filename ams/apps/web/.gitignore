@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+node_modules/
+ams/apps/web/node_modules/
+ams/apps/api/node_modules/
