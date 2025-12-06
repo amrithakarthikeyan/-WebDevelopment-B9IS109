@@ -1,43 +1,62 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { DashboardLayout } from "../layouts/DashboardLayout";
+import { useHealth } from "../hooks/useHealth";
 
 export const DashboardPage: React.FC = () => {
-  return (
-    <div className="min-h-screen bg-slate-100">
-      <header className="bg-white shadow-sm px-6 py-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold">AMS Dashboard</h1>
-        <nav className="space-x-4 text-sm">
-          <Link to="/dashboard" className="hover:underline">
-            Overview
-          </Link>
-          <span className="text-slate-400">|</span>
-          <Link to="/login" className="hover:underline">
-            Logout
-          </Link>
-        </nav>
-      </header>
+  const { data, isLoading, isError } = useHealth();
 
-      <main className="p-6">
-        <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
-          <div className="bg-white rounded-lg shadow p-4">
-            <h2 className="text-sm font-semibold mb-2">Total Assets</h2>
-            <p className="text-2xl font-bold">0</p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-4">
-            <h2 className="text-sm font-semibold mb-2">Assigned</h2>
-            <p className="text-2xl font-bold">0</p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-4">
-            <h2 className="text-sm font-semibold mb-2">In Stock</h2>
-            <p className="text-2xl font-bold">0</p>
-          </div>
+  let apiStatusText = "Checking…";
+  let apiStatusColor = "text-slate-500";
+
+  if (isLoading) {
+    apiStatusText = "Checking API…";
+  } else if (isError) {
+    apiStatusText = "Offline";
+    apiStatusColor = "text-red-600";
+  } else if (data?.status === "ok") {
+    apiStatusText = "Online";
+    apiStatusColor = "text-emerald-600";
+  }
+
+  return (
+    <DashboardLayout title="Dashboard">
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-4">
+        <div className="bg-white rounded-lg shadow p-4 md:col-span-1">
+          <h2 className="text-sm font-semibold mb-2 text-slate-600">
+            API Status
+          </h2>
+          <p className={`text-xl font-bold ${apiStatusColor}`}>
+            {apiStatusText}
+          </p>
+          {data?.message && (
+            <p className="mt-1 text-xs text-slate-500">{data.message}</p>
+          )}
         </div>
 
-        <p className="mt-6 text-sm text-slate-500">
-          This is just a placeholder dashboard. Next, you’ll connect it to your
-          backend and show real asset data here.
-        </p>
-      </main>
-    </div>
+        <div className="bg-white rounded-lg shadow p-4">
+          <h2 className="text-sm font-semibold mb-2 text-slate-600">
+            Total Assets
+          </h2>
+          <p className="text-2xl font-bold text-slate-900">0</p>
+        </div>
+        <div className="bg-white rounded-lg shadow p-4">
+          <h2 className="text-sm font-semibold mb-2 text-slate-600">
+            Assigned
+          </h2>
+          <p className="text-2xl font-bold text-slate-900">0</p>
+        </div>
+        <div className="bg-white rounded-lg shadow p-4">
+          <h2 className="text-sm font-semibold mb-2 text-slate-600">
+            In Stock
+          </h2>
+          <p className="text-2xl font-bold text-slate-900">0</p>
+        </div>
+      </div>
+
+      <p className="mt-6 text-sm text-slate-500">
+        The API status card above is powered by <code>/api/health</code> from
+        your backend. Later, you’ll fetch real asset statistics for these cards.
+      </p>
+    </DashboardLayout>
   );
 };
